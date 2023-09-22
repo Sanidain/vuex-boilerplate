@@ -99,7 +99,7 @@ const createAction = (actionName, actionsAst) => {
  * @param {*} param0
  * @returns
  */
-const createOrAddProperty = ({ propertyPath, value }, ast) => {
+const createStateProperty = ({ propertyPath, value }, ast) => {
   const pathArr = propertyPath?.split('.');
 
   // COMPOSITE PATH
@@ -197,7 +197,7 @@ const createMutation = (name, mutationsAst) => {
 
 export {
   createAction,
-  createOrAddProperty,
+  createStateProperty,
   createMutationType,
   createMutation,
 };
