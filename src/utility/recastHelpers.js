@@ -6,6 +6,24 @@ const { objectProperty, identifier, stringLiteral, literal, objectExpression } =
 const getPropertyByKey = (properties, key) =>
   properties.filter(({ key: { name } }) => key === name);
 
+  /**
+ * Returns modified ast with the added node
+ * @param {*} node 
+ * @param {*} ast 
+ */
+const addToDefaultExport = (node, ast) => {
+  recast.visit(ast, {
+    visitExportDefaultDeclaration(path) {
+      if (path.node.declaration.type === 'ObjectExpression') {
+        path.node.declaration.properties.push(node);
+      }
+      this.traverse(path);
+    },
+  });
+
+  return ast;
+};
+
 const extractNode = (code) => {
   const [ast] = recast.parse(`
 	export default {
@@ -82,16 +100,7 @@ const createAction = (actionName, actionsAst) => {
 		  commit(types.${camelToSnake(actionName)}, payload);
 		},`);
 
-  recast.visit(actionsAst, {
-    visitExportDefaultDeclaration(path) {
-      if (path.node.declaration.type === 'ObjectExpression') {
-        path.node.declaration.properties.push(node);
-      }
-      this.traverse(path);
-    },
-  });
-
-  return recast.print(actionsAst).code;
+    return recast.print(addToDefaultExport(node, actionsAst)).code;
 };
 
 /**
@@ -162,42 +171,34 @@ const createStateProperty = ({ propertyPath, value }, ast) => {
  * @returns
  */
 const createMutationType = (mutationName, mutationTypesAst) => {
-  recast.visit(mutationTypesAst, {
-    visitExportDefaultDeclaration(path) {
-      if (path.node.declaration.type === 'ObjectExpression') {
-        const newType = objectProperty(
+  const node = objectProperty(
           identifier(mutationName),
           stringLiteral(mutationName)
         );
-        path.node.declaration.properties.push(newType);
-      }
-      this.traverse(path);
-    },
-  });
 
-  return recast.print(mutationTypesAst).code;
-};
+  return recast.print(addToDefaultExport(node, mutationTypesAst)).code;
+}
 
 const createMutation = (name, mutationsAst) => {
   const node = extractNode(`[types.${name}](state, payload) {
 	state.allFiltersPerTenant = payload;
   }`);
 
-  recast.visit(mutationsAst, {
-    visitExportDefaultDeclaration(path) {
-      if (path.node.declaration.type === 'ObjectExpression') {
-        path.node.declaration.properties.push(node);
-      }
-      this.traverse(path);
-    },
-  });
-
-  return recast.print(mutationsAst).code;
+  return recast.print(addToDefaultExport(node, mutationsAst)).code;
 };
+
+
+
+const createGetter = (name, gettersAst) =>{
+  const node = extractNode(`${name}: (state) => state.name`)
+
+  return recast.print(addToDefaultExport(node, gettersAst)).code;
+}
 
 export {
   createAction,
   createStateProperty,
   createMutationType,
   createMutation,
+  createGetter,
 };
