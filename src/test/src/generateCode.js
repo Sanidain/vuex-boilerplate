@@ -49,7 +49,7 @@ const getOriginalCode = () => {
   };
 };
 
-getOriginalAsts = () => {
+const getOriginalAsts = () => {
   const {
     stateOriginalCode,
     mutationsOriginalCode,
