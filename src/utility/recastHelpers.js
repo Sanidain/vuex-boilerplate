@@ -179,9 +179,11 @@ const createMutationType = (mutationName, mutationTypesAst) => {
   return recast.print(addToDefaultExport(node, mutationTypesAst)).code;
 }
 
-const createMutation = (name, mutationsAst) => {
-  const node = extractNode(`[types.${name}](state, payload) {
-	state.allFiltersPerTenant = payload;
+const createMutation = (propertyPath, mutationsAst) => {
+  const finalDepth = propertyPath.split('.').pop();
+
+  const node = extractNode(`[types.SET_${camelToSnake(finalDepth)}](state, payload) {
+	state[${propertyPath}] = payload;
   }`);
 
   return recast.print(addToDefaultExport(node, mutationsAst)).code;
