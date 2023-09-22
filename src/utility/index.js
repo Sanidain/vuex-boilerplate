@@ -1,6 +1,7 @@
 export {
   createAction,
-  createOrAddProperty,
+  createStateProperty,
   createMutationType,
   createMutation,
+  createGetter,
 } from './recastHelpers';
