@@ -8,5 +8,11 @@
   },
   "keywords": [],
   "author": "Danijel Šain",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.9.3"
+  },
+  "dependencies": {
+    "recast": "^0.23.4"
+  }
 }
